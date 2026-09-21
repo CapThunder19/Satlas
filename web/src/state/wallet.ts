@@ -6,6 +6,7 @@ import { scanWallet, type ScanProgress, type ScanResult } from "../api/scan";
 import { useSettings } from "./settings";
 import { useLabels } from "./labels";
 import { DEMO_LABELS, DEMO_SCAN, DEMO_TIP_HEIGHT } from "../demo/wallet";
+import { useSimulator } from "./simulator";
 
 interface WalletState {
   wallet: Wallet | null;
@@ -116,6 +117,7 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   reset() {
     abort?.abort();
     get().wallet?.free();
+    useSimulator.getState().reset();
     set({
       wallet: null,
       info: null,

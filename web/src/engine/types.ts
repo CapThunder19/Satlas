@@ -135,3 +135,59 @@ export interface Report {
 }
 
 export const coinKey = (c: CoinRef | { txid: string; vout: number }) => `${c.txid}:${c.vout}`;
+
+// ---- simulator ----
+
+export type Strategy =
+  | "largest-first"
+  | "oldest-first"
+  | "smallest-first"
+  | "exact-match"
+  | "privacy-aware"
+  | "manual";
+
+export interface SpendRequest {
+  /** satoshis */
+  amount: number;
+  /** sat/vB */
+  feeRate: number;
+  strategy: Strategy;
+  manualInputs?: CoinRef[];
+  /** hex scriptPubKey of the recipient, for fee sizing and change heuristics */
+  recipientScript?: string;
+}
+
+export type LinkageKind =
+  | "label-mixing"
+  | "cluster-merge"
+  | "reused-address-input"
+  | "unlabelled-input"
+  | "change-revealed"
+  | "dust-change"
+  | "nothing-new";
+
+export interface Linkage {
+  kind: LinkageKind;
+  severity: Severity;
+  certainty: Certainty;
+  title: string;
+  explanation: string;
+  coins: CoinRef[];
+  labels: string[];
+}
+
+export type Verdict = "clean" | "caution" | "linking";
+
+export interface Simulation {
+  strategy: Strategy;
+  inputs: CoinRef[];
+  inputTotal: number;
+  amount: number;
+  fee: number;
+  vsize: number;
+  change: number | null;
+  verdict: Verdict;
+  summary: string;
+  linkages: Linkage[];
+  clustersTouched: number[];
+}

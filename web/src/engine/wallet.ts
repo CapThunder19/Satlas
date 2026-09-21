@@ -1,5 +1,13 @@
 import { loadEngine } from "../wasm";
-import type { DerivedAddress, Report, ScriptType, UserLabels, WalletInfo } from "./types";
+import type {
+  DerivedAddress,
+  Report,
+  ScriptType,
+  Simulation,
+  SpendRequest,
+  UserLabels,
+  WalletInfo,
+} from "./types";
 import type { EsploraTx } from "../api/esplora";
 import type { Wallet as WasmWallet } from "../wasm/pkg/satlas_wasm";
 
@@ -51,5 +59,45 @@ export async function analyzeWallet(
     return engine.analyzeWallet(txs, addresses, labels) as Report;
   } catch (e) {
     throw new Error(typeof e === "string" ? e : String(e));
+  }
+}
+
+function rethrow(e: unknown): never {
+  throw new Error(typeof e === "string" ? e : String(e));
+}
+
+export async function simulateSpend(report: Report, request: SpendRequest): Promise<Simulation> {
+  const engine = await loadEngine();
+  try {
+    return engine.simulateSpend(report, request) as Simulation;
+  } catch (e) {
+    rethrow(e);
+  }
+}
+
+export async function simulateAll(report: Report, request: SpendRequest): Promise<Simulation[]> {
+  const engine = await loadEngine();
+  try {
+    return engine.simulateAll(report, request) as Simulation[];
+  } catch (e) {
+    rethrow(e);
+  }
+}
+
+export async function exportBip329(labels: UserLabels): Promise<string> {
+  const engine = await loadEngine();
+  try {
+    return engine.exportBip329(labels);
+  } catch (e) {
+    rethrow(e);
+  }
+}
+
+export async function importBip329(jsonl: string): Promise<UserLabels> {
+  const engine = await loadEngine();
+  try {
+    return engine.importBip329(jsonl) as UserLabels;
+  } catch (e) {
+    rethrow(e);
   }
 }

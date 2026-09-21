@@ -1,61 +1,53 @@
 import { useEffect, useState } from "react";
 import { loadEngine } from "./wasm";
 import { useWalletStore } from "./state/wallet";
-import ImportWallet from "./components/ImportWallet";
+import Landing from "./components/Landing";
 import WalletView from "./components/WalletView";
+import HelpModal from "./components/HelpModal";
+import SettingsModal from "./components/SettingsModal";
 
 export default function App() {
-  const [engineVersion, setEngineVersion] = useState<string | null>(null);
   const [engineError, setEngineError] = useState<string | null>(null);
+  const [modal, setModal] = useState<"help" | "settings" | null>(null);
   const hasWallet = useWalletStore((s) => s.info !== null);
-  const loadDemo = useWalletStore((s) => s.loadDemo);
 
   useEffect(() => {
-    loadEngine()
-      .then((e) => setEngineVersion(e.version()))
-      .catch((err) => setEngineError(String(err)));
+    loadEngine().catch((err) => setEngineError(String(err)));
   }, []);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <header className="border-b border-zinc-900">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <h1 className="text-xl font-semibold tracking-tight">Satlas</h1>
-          <span className="text-xs text-zinc-500">
-            {engineError
-              ? `engine error: ${engineError}`
-              : engineVersion
-                ? `engine v${engineVersion}`
-                : "loading engine..."}
-          </span>
+          <button onClick={() => useWalletStore.getState().reset()} className="text-xl font-semibold tracking-tight">
+            Satlas
+          </button>
+          <nav className="flex items-center gap-4 text-sm text-zinc-400">
+            <button onClick={() => setModal("help")} className="hover:text-zinc-100">
+              How it works
+            </button>
+            <button onClick={() => setModal("settings")} className="hover:text-zinc-100" aria-label="Settings" title="Settings">
+              ⚙
+            </button>
+          </nav>
         </div>
       </header>
 
-      <main className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 py-12">
-        {!hasWallet && (
-          <div className="text-center">
-            <h2 className="text-3xl font-semibold tracking-tight">
-              Know what your Bitcoin reveals before you spend it.
-            </h2>
-            <p className="mt-2 text-zinc-400">
-              Import a watch-only wallet to see your coins and simulate a spend.
-            </p>
-          </div>
+      <main className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 py-10">
+        {engineError && (
+          <p role="alert" className="w-full rounded-md border border-red-900 bg-red-950/50 px-3 py-2 text-sm text-red-300">
+            Satlas could not start its analysis engine: {engineError}. Try a different browser.
+          </p>
         )}
-        {hasWallet ? (
-          <WalletView />
-        ) : (
-          <>
-            <ImportWallet />
-            <button
-              onClick={() => void loadDemo()}
-              className="text-sm text-zinc-400 underline-offset-4 hover:text-zinc-200 hover:underline"
-            >
-              No wallet handy? Load the demo wallet
-            </button>
-          </>
-        )}
+        {hasWallet ? <WalletView /> : <Landing />}
       </main>
+
+      <footer className="mx-auto max-w-5xl px-4 pb-8 text-center text-xs text-zinc-600">
+        Watch-only. No account, no server, no keys. Your labels stay in this browser.
+      </footer>
+
+      {modal === "help" && <HelpModal onClose={() => setModal(null)} />}
+      {modal === "settings" && <SettingsModal onClose={() => setModal(null)} />}
     </div>
   );
 }

@@ -10,7 +10,7 @@ them to your IP. This is the same tradeoff every watch-only wallet using a publi
 backend makes.
 
 **How to remove that tradeoff:** configure a self-hosted Esplora/Electrs endpoint
-in Settings (stretch goal). Then no third party sees your addresses.
+in Settings (the gear icon). Then no third party sees your addresses.
 
 Labels you create are stored only in your browser's IndexedDB and can be exported
 as BIP-329 JSONL.

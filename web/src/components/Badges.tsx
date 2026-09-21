@@ -1,4 +1,5 @@
 import type { Certainty, Severity } from "../engine/types";
+import { CERTAINTY } from "../lib/copy";
 
 const CERTAINTY_STYLE: Record<Certainty, string> = {
   known: "border-emerald-800 bg-emerald-950/60 text-emerald-300",
@@ -6,20 +7,30 @@ const CERTAINTY_STYLE: Record<Certainty, string> = {
   unknown: "border-zinc-700 bg-zinc-900 text-zinc-400",
 };
 
-const CERTAINTY_TITLE: Record<Certainty, string> = {
-  known: "Known: directly observable on-chain, or stated by you",
-  inferred: "Inferred: follows from a heuristic that is usually, but not always, right",
-  unknown: "Unknown: not enough information",
-};
-
 export function CertaintyBadge({ certainty }: { certainty: Certainty }) {
+  const c = CERTAINTY[certainty];
   return (
     <span
-      title={CERTAINTY_TITLE[certainty]}
+      title={c.short}
       className={`rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${CERTAINTY_STYLE[certainty]}`}
     >
-      {certainty}
+      {c.label}
     </span>
+  );
+}
+
+/** One-line legend explaining the three certainty badges. */
+export function CertaintyLegend() {
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-500">
+      <span>How sure is Satlas?</span>
+      {(["known", "inferred", "unknown"] as Certainty[]).map((c) => (
+        <span key={c} className="inline-flex items-center gap-1.5">
+          <CertaintyBadge certainty={c} />
+          <span>{CERTAINTY[c].short}</span>
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -29,15 +40,21 @@ const SEVERITY_STYLE: Record<Severity, string> = {
   high: "bg-red-950 text-red-300",
 };
 
+const SEVERITY_LABEL: Record<Severity, string> = {
+  info: "Good to know",
+  warning: "Heads up",
+  high: "Important",
+};
+
 export function SeverityDot({ severity }: { severity: Severity }) {
   return (
-    <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${SEVERITY_STYLE[severity]}`}>
-      {severity}
+    <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${SEVERITY_STYLE[severity]}`}>
+      {SEVERITY_LABEL[severity]}
     </span>
   );
 }
 
-/** Stable, distinguishable colour per cluster id. */
+/** Stable, distinguishable colour per group id. */
 export function clusterColor(id: number): string {
   const palette = [
     "bg-sky-400",
@@ -55,11 +72,15 @@ export function clusterColor(id: number): string {
 export function ClusterChip({ id, size }: { id: number; size: number }) {
   return (
     <span
-      title={`Cluster ${id + 1}: ${size} address${size === 1 ? "" : "es"} an observer can link together`}
+      title={
+        size > 1
+          ? `Group ${id + 1}: ${size} of your addresses that an outsider can already tell belong together`
+          : `Group ${id + 1}: this coin is not publicly linked to any of your other coins`
+      }
       className="inline-flex items-center gap-1 rounded border border-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-400"
     >
       <span className={`inline-block h-2 w-2 rounded-full ${clusterColor(id)}`} />
-      cluster {id + 1}
+      group {id + 1}
     </span>
   );
 }
@@ -71,10 +92,11 @@ export function LabelChip({ text, certainty }: { text: string; certainty: Certai
       : "border-dashed border-zinc-700 bg-zinc-900 text-zinc-400";
   return (
     <span
-      title={certainty === "known" ? "Your label" : "Inferred from your other labels"}
+      title={certainty === "known" ? "Your label" : "Guessed from your other labels (this is change from coins with this label)"}
       className={`rounded-full border px-2 py-0.5 text-xs ${style}`}
     >
       {text}
+      {certainty !== "known" && "?"}
     </span>
   );
 }

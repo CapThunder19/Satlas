@@ -6,11 +6,13 @@
 pub use miniscript;
 pub use miniscript::bitcoin;
 
+pub mod bip329;
 pub mod chain;
 pub mod descriptor;
 pub mod error;
 pub mod heuristics;
 pub mod labels;
+pub mod simulate;
 pub mod wallet;
 
 pub use error::Error;
