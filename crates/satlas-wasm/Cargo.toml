@@ -1,0 +1,24 @@
+[package]
+name = "satlas-wasm"
+description = "wasm-bindgen bindings for satlas-core."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+satlas-core = { path = "../satlas-core" }
+serde.workspace = true
+serde_json.workspace = true
+wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"
+console_error_panic_hook = "0.1"
+
+# Rust >=1.87 emits bulk-memory / nontrapping-float ops for wasm32 by default;
+# the wasm-opt bundled with wasm-pack must be told to accept them.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-Oz", "--enable-bulk-memory", "--enable-nontrapping-float-to-int", "--enable-sign-ext", "--enable-mutable-globals"]
