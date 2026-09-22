@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5",
+    "d3-force": "^3.0.0",
+    "d3-polygon": "^3.0.1",
     "idb-keyval": "^6",
     "react": "^19",
     "react-dom": "^19",
@@ -22,6 +24,8 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4",
+    "@types/d3-force": "^3.0.10",
+    "@types/d3-polygon": "^3.0.2",
     "@types/node": "^26.6.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",

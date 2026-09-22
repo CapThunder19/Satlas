@@ -54,22 +54,7 @@ export function SeverityDot({ severity }: { severity: Severity }) {
   );
 }
 
-/** Stable, distinguishable colour per group id. */
-export function clusterColor(id: number): string {
-  const palette = [
-    "bg-sky-400",
-    "bg-rose-400",
-    "bg-emerald-400",
-    "bg-violet-400",
-    "bg-amber-400",
-    "bg-teal-400",
-    "bg-fuchsia-400",
-    "bg-lime-400",
-  ];
-  return palette[id % palette.length]!;
-}
-
-export function ClusterChip({ id, size }: { id: number; size: number }) {
+export function ClusterChip({ id, size, color }: { id: number; size: number; color: string }) {
   return (
     <span
       title={
@@ -79,7 +64,7 @@ export function ClusterChip({ id, size }: { id: number; size: number }) {
       }
       className="inline-flex items-center gap-1 rounded border border-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-400"
     >
-      <span className={`inline-block h-2 w-2 rounded-full ${clusterColor(id)}`} />
+      <span className="inline-block h-2 w-2 rounded-full" style={{ background: color }} />
       group {id + 1}
     </span>
   );

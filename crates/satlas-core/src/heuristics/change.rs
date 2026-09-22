@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 use super::{Finding, FindingKind, Severity};
 use crate::chain::EsploraTx;
 use crate::descriptor::DerivedAddress;
+use crate::fmt::btc;
 use crate::labels::Certainty;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -80,8 +81,9 @@ pub(super) fn observer_signals(
     if is_round(payment.value) && !is_round(change.value) {
         kinds.push(ChangeSignalKind::RoundPayment);
         reasons.push(format!(
-            "the other output is a round {} sat, which looks like an intended payment, leaving {} sat as change",
-            payment.value, change.value
+            "the other output is a round {}, which looks like an intended payment, leaving {} as change",
+            btc(payment.value),
+            btc(change.value)
         ));
     }
 
@@ -108,8 +110,9 @@ pub(super) fn observer_signals(
         if tx.vin.len() > 1 && change.value < min_in && payment.value >= min_in {
             kinds.push(ChangeSignalKind::UnnecessaryInput);
             reasons.push(format!(
-                "if {} sat were the payment, the smallest input ({} sat) would not have been needed",
-                change.value, min_in
+                "if {} were the payment, the smallest input ({}) would not have been needed",
+                btc(change.value),
+                btc(min_in)
             ));
         }
     }

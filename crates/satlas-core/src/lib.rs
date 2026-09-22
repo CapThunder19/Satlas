@@ -10,6 +10,7 @@ pub mod bip329;
 pub mod chain;
 pub mod descriptor;
 pub mod error;
+pub mod fmt;
 pub mod heuristics;
 pub mod labels;
 pub mod simulate;

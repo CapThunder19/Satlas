@@ -9,8 +9,10 @@ import CoinCard from "./CoinCard";
 import Findings from "./Findings";
 import LabelTools from "./LabelTools";
 import Simulator from "./Simulator";
+import CoinGraph from "./CoinGraph";
+import { assignGroupColors, groupColor } from "../lib/clusterColors";
 
-type Tab = "coins" | "check";
+type Tab = "coins" | "check" | "map";
 
 export default function WalletView() {
   const {
@@ -21,6 +23,7 @@ export default function WalletView() {
   const [tab, setTab] = useState<Tab>("coins");
 
   const coinAnalysis = useMemo(() => new Map(analysis?.coins.map((c) => [coinKey(c), c]) ?? []), [analysis]);
+  const groupColors = useMemo(() => assignGroupColors(analysis), [analysis]);
   const report: Report | null = useMemo(() => (snapshot && analysis ? { snapshot, analysis } : null), [snapshot, analysis]);
   const spending = useMemo(() => new Set(tab === "check" ? (result?.inputs.map(coinKey) ?? []) : []), [result, tab]);
 
@@ -123,6 +126,9 @@ export default function WalletView() {
             <TabButton active={tab === "check"} onClick={() => setTab("check")} accent>
               Check a payment
             </TabButton>
+            <TabButton active={tab === "map"} onClick={() => setTab("map")}>
+              Map
+            </TabButton>
           </nav>
 
           {tab === "coins" && (
@@ -156,6 +162,27 @@ export default function WalletView() {
             </div>
           )}
 
+          {tab === "map" && analysis && snapshot && (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-lg font-semibold">How your coins connect</h2>
+                <p className="mt-1 text-sm text-zinc-400">
+                  Coins inside the same shaded area are already linked in public: an outsider can tell they belong to
+                  the same person. Separate areas are still separate.
+                  {result
+                    ? " The dashed amber line shows the link your planned payment would create."
+                    : " Enter an amount under “Check a payment” to see what a payment would join together."}
+                </p>
+              </div>
+              <CoinGraph utxos={snapshot.utxos} analysis={analysis} simulation={result} />
+              {result && result.verdict === "linking" && (
+                <p className="rounded-md border border-red-900/60 bg-red-950/30 px-3 py-2 text-sm text-red-200">
+                  {result.summary}
+                </p>
+              )}
+            </div>
+          )}
+
           {tab === "check" && report && (
             <div className="space-y-8">
               <Simulator report={report} />
@@ -186,6 +213,7 @@ export default function WalletView() {
               utxo={u}
               analysis={a}
               clusterSize={a ? analysis?.clusters[a.clusterId]?.addresses.length : undefined}
+              clusterColor={a ? groupColor(groupColors, a.clusterId) : undefined}
               tipHeight={tipHeight}
               selected={manualMode ? manual.has(k) : undefined}
               onToggle={() => toggleManual(u)}

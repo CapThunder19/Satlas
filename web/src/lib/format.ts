@@ -41,3 +41,10 @@ export function confirmations(height: number | null, tip: number | null): number
   if (height == null || tip == null) return height == null ? 0 : null;
   return Math.max(0, tip - height + 1);
 }
+
+/** "0.2 BTC", "0.257412 BTC": trailing zeros trimmed, for labels where space is tight. */
+export function formatBtcShort(sats: number): string {
+  const s = formatBtc(sats).replace(" BTC", "");
+  const trimmed = s.includes(".") ? s.replace(/0+$/, "").replace(/\.$/, "") : s;
+  return `${trimmed} BTC`;
+}

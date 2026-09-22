@@ -11,6 +11,7 @@ interface Props {
   utxo: Utxo;
   analysis?: CoinAnalysis;
   clusterSize?: number;
+  clusterColor?: string;
   tipHeight: number | null;
   /** Manual-selection checkbox state; undefined hides the checkbox. */
   selected?: boolean;
@@ -23,6 +24,7 @@ export default function CoinCard({
   utxo,
   analysis,
   clusterSize = 1,
+  clusterColor = "#71717a",
   tipHeight,
   selected,
   onToggle,
@@ -89,7 +91,7 @@ export default function CoinCard({
             <CertaintyBadge certainty={analysis.origin.certainty} />
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <ClusterChip id={analysis.clusterId} size={clusterSize} />
+            <ClusterChip id={analysis.clusterId} size={clusterSize} color={clusterColor} />
             {analysis.addressUseCount > 1 && (
               <span
                 className="rounded bg-amber-950 px-1.5 py-0.5 text-[10px] font-medium text-amber-300"

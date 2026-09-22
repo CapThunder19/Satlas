@@ -10,6 +10,7 @@ use miniscript::bitcoin::{OutPoint, ScriptBuf};
 use serde::{Deserialize, Serialize};
 
 use crate::error::{Error, Result};
+use crate::fmt::btc;
 use crate::heuristics::{Analysis, CoinAnalysis, CoinRef, Severity};
 use crate::labels::Certainty;
 use crate::wallet::{Utxo, WalletSnapshot};
@@ -375,7 +376,7 @@ fn describe(ctx: &Ctx, req: &SpendRequest, inputs: Vec<&Utxo>) -> Simulation {
             .iter()
             .map(|(id, l, coins)| {
                 let label = if l.is_empty() { "unlabelled".to_string() } else { l.iter().cloned().collect::<Vec<_>>().join("/") };
-                format!("cluster {} ({} coin{}, {label})", id + 1, coins.len(), if coins.len() == 1 { "" } else { "s" })
+                format!("group {} ({} coin{}, {label})", id + 1, coins.len(), if coins.len() == 1 { "" } else { "s" })
             })
             .collect();
         linkages.push(Linkage {
@@ -405,11 +406,18 @@ fn describe(ctx: &Ctx, req: &SpendRequest, inputs: Vec<&Utxo>) -> Simulation {
                 reused.len(),
                 if reused.len() == 1 { " sits" } else { "s sit" }
             ),
-            explanation: format!(
-                "{} received more than one payment. Spending from it ties every one of those payments, \
-                 and everyone who sent them, to this transaction.",
-                join_names(&reused.iter().map(|u| u.address.clone()).collect::<Vec<_>>())
-            ),
+            explanation: {
+                // Several inputs may sit on the same reused address; name it once.
+                let mut addrs: Vec<String> = reused.iter().map(|u| u.address.clone()).collect();
+                addrs.sort();
+                addrs.dedup();
+                format!(
+                    "{} received more than one payment. Spending from {} ties every one of those payments, \
+                     and everyone who sent them, to this transaction.",
+                    join_names(&addrs),
+                    if addrs.len() == 1 { "it" } else { "them" }
+                )
+            },
             coins: reused.iter().map(|u| u.outpoint().into()).collect(),
             labels: Vec::new(),
         });
@@ -439,7 +447,7 @@ fn describe(ctx: &Ctx, req: &SpendRequest, inputs: Vec<&Utxo>) -> Simulation {
     if let Some(chg) = change {
         let mut reasons = Vec::new();
         if req.amount >= 10_000 && req.amount % 10_000 == 0 && chg % 10_000 != 0 {
-            reasons.push(format!("the payment is a round {} sat while the change is not", req.amount));
+            reasons.push(format!("the payment is a round {} while the change is not", btc(req.amount)));
         }
         if let Some(r) = req.recipient_script.as_ref() {
             let in_kind = script_kind(&inputs[0].script_pubkey);
@@ -455,8 +463,9 @@ fn describe(ctx: &Ctx, req: &SpendRequest, inputs: Vec<&Utxo>) -> Simulation {
                 title: "Your change output will be easy to identify".into(),
                 explanation: format!(
                     "An observer can probably tell which output is change because {}. The change coin \
-                     ({chg} sat) will then be publicly tied to every input of this spend.",
-                    join_names(&reasons)
+                     ({}) will then be publicly tied to every input of this spend.",
+                    join_names(&reasons),
+                    btc(chg)
                 ),
                 coins: Vec::new(),
                 labels: Vec::new(),
@@ -467,7 +476,7 @@ fn describe(ctx: &Ctx, req: &SpendRequest, inputs: Vec<&Utxo>) -> Simulation {
                 kind: LinkageKind::DustChange,
                 severity: Severity::Info,
                 certainty: Certainty::Known,
-                title: format!("Tiny change output ({chg} sat)"),
+                title: format!("Tiny change output ({chg} sats)"),
                 explanation: "Very small change is easy to spot and may cost more in fees to spend later than it is worth. \
                               Consider adjusting the amount or adding it to the fee."
                     .into(),

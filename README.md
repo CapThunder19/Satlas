@@ -24,6 +24,9 @@ link together — before you sign anything in your real wallet.
   shows which coins would be spent, the fee and change, and explains in plain English what
   new links the transaction would create: label mixing, cluster merges, reused-address
   inputs, identifiable change. All strategies are compared side by side.
+- **Map.** A force-directed map of your coins: bubbles sized by value, shaded areas for groups an
+  outsider can already link, dashed amber for the link a planned payment would create. Colours
+  validated for colour-vision deficiency; every group also carries a text label.
 - **Demo wallet.** A built-in synthetic history for trying the tool without a wallet.
 - **Beginner-first UI.** Plain-language explanations, a glossary, per-wallet “where is my xpub” help,
   Fact / Likely / Unclear badges on every conclusion, and “what you can do” advice for every warning.

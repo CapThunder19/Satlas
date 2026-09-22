@@ -113,7 +113,7 @@ fn round_payment_reveals_change() {
     // t7 pays a round 600_000 with change 74_000: revealed. t5/t6 change was spent, so not a UTXO.
     assert_eq!(revealed.len(), 1);
     assert_eq!(revealed[0].txid, Some(txid(7)));
-    assert!(revealed[0].explanation.contains("round 600000 sat"));
+    assert!(revealed[0].explanation.contains("round 0.006 BTC"), "{}", revealed[0].explanation);
 }
 
 #[test]
