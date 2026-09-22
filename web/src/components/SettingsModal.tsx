@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Modal from "./Modal";
 import { useSettings } from "../state/settings";
-import { DEFAULT_ENDPOINTS } from "../api/esplora";
+import { DEFAULT_ENDPOINTS, KNOWN_ENDPOINTS } from "../api/esplora";
 import type { Network } from "../engine/types";
 
 const NETWORKS: { id: Network; label: string }[] = [
@@ -46,6 +46,19 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                     isUrl(endpoints[n.id]) ? "border-zinc-800 focus:border-amber-500" : "border-red-800"
                   }`}
                 />
+                <select
+                  aria-label="Preset servers"
+                  value=""
+                  onChange={(e) => e.target.value && setEndpoint(n.id, e.target.value)}
+                  className="rounded-md border border-zinc-800 bg-zinc-900 px-2 text-xs text-zinc-300"
+                >
+                  <option value="">presets…</option>
+                  {KNOWN_ENDPOINTS[n.id].map((k) => (
+                    <option key={k.url} value={k.url}>
+                      {k.name}
+                    </option>
+                  ))}
+                </select>
                 {endpoints[n.id] !== DEFAULT_ENDPOINTS[n.id] && (
                   <button onClick={() => resetEndpoint(n.id)} className="text-xs text-zinc-400 hover:text-zinc-200">
                     reset

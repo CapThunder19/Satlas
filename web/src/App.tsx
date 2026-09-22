@@ -10,9 +10,12 @@ export default function App() {
   const [engineError, setEngineError] = useState<string | null>(null);
   const [modal, setModal] = useState<"help" | "settings" | null>(null);
   const hasWallet = useWalletStore((s) => s.info !== null);
+  const restoring = useWalletStore((s) => s.restoring);
 
   useEffect(() => {
-    loadEngine().catch((err) => setEngineError(String(err)));
+    loadEngine()
+      .then(() => useWalletStore.getState().restore())
+      .catch((err) => setEngineError(String(err)));
   }, []);
 
   return (
@@ -39,7 +42,7 @@ export default function App() {
             Satlas could not start its analysis engine: {engineError}. Try a different browser.
           </p>
         )}
-        {hasWallet ? <WalletView /> : <Landing />}
+        {hasWallet ? <WalletView /> : restoring ? <p className="text-sm text-zinc-500">Reopening your wallet…</p> : <Landing />}
       </main>
 
       <footer className="mx-auto max-w-5xl px-4 pb-8 text-center text-xs text-zinc-600">

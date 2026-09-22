@@ -15,11 +15,11 @@ import type { Wallet as WasmWallet } from "../wasm/pkg/satlas_wasm";
 export class Wallet {
   private constructor(private readonly inner: WasmWallet) {}
 
-  static async parse(input: string, scriptType: ScriptType = "native-segwit"): Promise<Wallet> {
+  static async parse(input: string, scriptType: ScriptType = "native-segwit", network?: Network): Promise<Wallet> {
     const engine = await loadEngine();
     // The constructor throws a plain string on invalid input; normalise to Error.
     try {
-      return new Wallet(new engine.Wallet(input, scriptType));
+      return new Wallet(new engine.Wallet(input, scriptType, network));
     } catch (e) {
       throw new Error(typeof e === "string" ? e : String(e));
     }

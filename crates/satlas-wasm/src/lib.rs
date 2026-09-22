@@ -50,13 +50,17 @@ pub struct Wallet {
 #[wasm_bindgen]
 impl Wallet {
     /// `script_type` is one of "legacy" | "nested-segwit" | "native-segwit" | "taproot"
-    /// and only matters for bare xpub/tpub input.
+    /// and only matters for bare xpub/tpub input. `network` optionally forces
+    /// "bitcoin" | "signet" | "testnet" | "regtest" (test keys default to signet).
     #[wasm_bindgen(constructor)]
-    pub fn new(input: &str, script_type: &str) -> Result<Wallet, JsValue> {
+    pub fn new(input: &str, script_type: &str, network: Option<String>) -> Result<Wallet, JsValue> {
         let script_type: ScriptType =
             serde_json::from_value(serde_json::Value::String(script_type.to_string()))
                 .map_err(|_| js_err(format!("unknown script type {script_type:?}")))?;
-        let inner = WalletDescriptor::parse(input, script_type).map_err(js_err)?;
+        let network = network
+            .map(|n| n.parse::<satlas_core::bitcoin::Network>().map_err(|_| js_err(format!("unknown network {n:?}"))))
+            .transpose()?;
+        let inner = WalletDescriptor::parse_on(input, script_type, network).map_err(js_err)?;
         Ok(Wallet { inner })
     }
 

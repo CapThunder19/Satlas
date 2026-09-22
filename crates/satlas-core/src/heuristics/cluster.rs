@@ -112,15 +112,14 @@ pub(super) fn build(
         // absorbing a never-before-seen address is routine, not news.
         let established = groups.iter().filter(|g| linking.contains_key(g)).count();
         let merged_addresses: Vec<Vec<String>> = if established >= 2 {
-            groups
-                .iter()
-                .map(|&g| {
-                    (0..scripts.len())
-                        .filter(|&i| uf.find(i) == g)
-                        .map(|i| ours[scripts[i]].address.clone())
-                        .collect()
-                })
-                .collect()
+            let mut by_group: HashMap<usize, Vec<String>> = groups.iter().map(|&g| (g, Vec::new())).collect();
+            for i in 0..scripts.len() {
+                let r = uf.find(i);
+                if let Some(v) = by_group.get_mut(&r) {
+                    v.push(ours[scripts[i]].address.clone());
+                }
+            }
+            groups.iter().map(|g| by_group.remove(g).unwrap_or_default()).collect()
         } else {
             Vec::new()
         };
@@ -169,6 +168,10 @@ pub(super) fn build(
 
     // Materialise clusters, numbering them in order of first appearance among UTXOs
     // so unused addresses do not produce empty clusters.
+    let mut members: HashMap<usize, Vec<usize>> = HashMap::new();
+    for i in 0..scripts.len() {
+        members.entry(uf.find(i)).or_default().push(i);
+    }
     let mut root_to_id: HashMap<usize, u32> = HashMap::new();
     let mut clusters: Vec<Cluster> = Vec::new();
     let mut coin_cluster = HashMap::new();
@@ -177,10 +180,8 @@ pub(super) fn build(
         let root = uf.find(idx[&u.script_pubkey]);
         let id = *root_to_id.entry(root).or_insert_with(|| {
             let id = clusters.len() as u32;
-            let addresses: Vec<String> = (0..scripts.len())
-                .filter(|&i| uf.find(i) == root)
-                .map(|i| ours[scripts[i]].address.clone())
-                .collect();
+            let addresses: Vec<String> =
+                members[&root].iter().map(|&i| ours[scripts[i]].address.clone()).collect();
             clusters.push(Cluster {
                 id,
                 addresses,

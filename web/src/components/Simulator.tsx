@@ -3,6 +3,7 @@ import type { Report, Simulation, Strategy } from "../engine/types";
 import { LINKAGE_ADVICE, STRATEGY, VERDICT } from "../lib/copy";
 import { formatBtc, formatSats } from "../lib/format";
 import { useSimulator } from "../state/simulator";
+import { useWalletStore } from "../state/wallet";
 import { CertaintyBadge, SeverityDot } from "./Badges";
 
 const ALL: Strategy[] = ["largest-first", "oldest-first", "smallest-first", "exact-match", "privacy-aware", "manual"];
@@ -10,7 +11,14 @@ const RANK: Record<Simulation["verdict"], number> = { clean: 0, caution: 1, link
 
 export default function Simulator({ report }: { report: Report }) {
   const sim = useSimulator();
+  const fees = useWalletStore((s) => s.fees);
   const [advanced, setAdvanced] = useState(false);
+
+  // Default to the explorer's current "normal" rate once known, unless the user changed it.
+  useEffect(() => {
+    if (fees && sim.feeRate === 10) sim.setFeeRate(fees.medium);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fees]);
 
   useEffect(() => {
     void sim.run(report);
@@ -71,6 +79,21 @@ export default function Simulator({ report }: { report: Report }) {
               onChange={(e) => sim.setFeeRate(Math.max(1, Number(e.target.value)))}
               className="mt-1 w-28 rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 font-mono text-sm text-zinc-100 focus:border-amber-500 focus:outline-none"
             />
+            {fees && (
+              <div className="mt-1 flex gap-2 text-[11px] text-zinc-500">
+                {(
+                  [
+                    ["fast", fees.fast],
+                    ["normal", fees.medium],
+                    ["slow", fees.slow],
+                  ] as const
+                ).map(([name, rate]) => (
+                  <button key={name} type="button" onClick={() => sim.setFeeRate(rate)} className="hover:text-zinc-200">
+                    {name} {rate}
+                  </button>
+                ))}
+              </div>
+            )}
           </label>
           {sim.strategy === "manual" && (
             <p className="text-xs text-zinc-400 sm:col-span-2">

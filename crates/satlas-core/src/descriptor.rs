@@ -58,6 +58,30 @@ impl WalletDescriptor {
     /// `script_type` is only used for bare `xpub`/`tpub` keys, whose prefix
     /// does not imply a script type.
     pub fn parse(input: &str, script_type: ScriptType) -> Result<Self> {
+        Self::parse_on(input, script_type, None)
+    }
+
+    /// Like [`parse`](Self::parse) but with an explicit network. A testnet
+    /// key (tpub) is shared by signet, testnet and regtest, so callers may
+    /// need to say which one they mean. Rejects a key from the wrong kind of
+    /// network (e.g. an xpub with `Network::Signet`).
+    pub fn parse_on(input: &str, script_type: ScriptType, network: Option<Network>) -> Result<Self> {
+        let mut w = Self::parse_inner(input, script_type)?;
+        if let Some(n) = network {
+            let want_test = n != Network::Bitcoin;
+            let have_test = w.network != Network::Bitcoin;
+            if want_test != have_test {
+                return Err(Error::Descriptor(format!(
+                    "this key is for {}, not {n}",
+                    if have_test { "a test network" } else { "mainnet" }
+                )));
+            }
+            w.network = n;
+        }
+        Ok(w)
+    }
+
+    fn parse_inner(input: &str, script_type: ScriptType) -> Result<Self> {
         let input = input.trim();
         if input.is_empty() {
             return Err(Error::Descriptor("empty input".into()));
@@ -280,6 +304,16 @@ mod tests {
         let w = WalletDescriptor::parse(tpub, ScriptType::NativeSegwit).unwrap();
         assert_eq!(w.network, Network::Signet);
         assert!(w.address_at(EXTERNAL, 0).unwrap().address.starts_with("tb1q"));
+    }
+
+    #[test]
+    fn network_override() {
+        let tpub = "tpubDC5FSnBiZDMmhiuCmWAYsLwgLYrrT9rAqvTySfuCCrgsWz8wxMXUS9Tb9iVMvcRbvFcAHGkMD5Kx8koh4GquNGNTfohfk7pgjhaPCdXpoba";
+        let w = WalletDescriptor::parse_on(tpub, ScriptType::NativeSegwit, Some(Network::Testnet)).unwrap();
+        assert_eq!(w.network, Network::Testnet);
+        assert!(WalletDescriptor::parse_on(tpub, ScriptType::NativeSegwit, Some(Network::Bitcoin)).is_err());
+        assert!(WalletDescriptor::parse_on(BIP84_ZPUB, ScriptType::NativeSegwit, Some(Network::Signet)).is_err());
+        assert_eq!(WalletDescriptor::parse_on(BIP84_ZPUB, ScriptType::NativeSegwit, Some(Network::Bitcoin)).unwrap().network, Network::Bitcoin);
     }
 
     #[test]

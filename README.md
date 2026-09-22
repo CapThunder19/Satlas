@@ -27,6 +27,10 @@ link together — before you sign anything in your real wallet.
 - **Demo wallet.** A built-in synthetic history for trying the tool without a wallet.
 - **Beginner-first UI.** Plain-language explanations, a glossary, per-wallet “where is my xpub” help,
   Fact / Likely / Unclear badges on every conclusion, and “what you can do” advice for every warning.
+- **Built for real wallets.** Parallel gap-limit scan with retries, rate-limit backoff and per-request
+  timeouts; complete history pagination verified against the provider's own transaction counts;
+  automatic failover between mempool.space and blockstream.info; results cached in IndexedDB so
+  reopening is instant; optional “remember this wallet” on the device.
 - **Self-hosted backend.** Point Satlas at your own Esplora/mempool instance in Settings.
 
 ## Layout

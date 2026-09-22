@@ -3,10 +3,9 @@ import type { DerivedAddress } from "../engine/types";
 import type { Wallet } from "../engine/wallet";
 
 export interface ScanProgress {
-  chain: 0 | 1;
-  /** Highest index checked so far on this chain. */
-  index: number;
-  /** Addresses with history found so far, across both chains. */
+  /** Addresses checked so far, both chains. */
+  checked: number;
+  /** Addresses with history found so far. */
   used: number;
   txs: number;
 }
@@ -14,8 +13,8 @@ export interface ScanProgress {
 export interface ScanOptions {
   /** BIP-44 gap limit: stop after this many consecutive unused addresses. */
   gap?: number;
-  /** Addresses fetched concurrently. Keep modest for public APIs. */
-  batch?: number;
+  /** Requests in flight per chain. */
+  concurrency?: number;
   onProgress?: (p: ScanProgress) => void;
   signal?: AbortSignal;
 }
@@ -32,48 +31,72 @@ export interface ScanResult {
 /**
  * Discover wallet history with a gap-limit scan over both chains.
  * Derivation happens in wasm; fetching happens here.
+ *
+ * Each chain runs a small worker pool over a sliding window of indices. A
+ * worker stops when every index up to `highestUsed + gap` has been checked.
  */
 export async function scanWallet(
   wallet: Wallet,
   client: EsploraClient,
-  { gap = 20, batch = 5, onProgress, signal }: ScanOptions = {},
+  { gap = 20, concurrency = 4, onProgress, signal }: ScanOptions = {},
 ): Promise<ScanResult> {
   const addresses: DerivedAddress[] = [];
   const txsById = new Map<string, EsploraTx>();
   const lastUsed = { external: -1, internal: -1 };
+  let checked = 0;
   let used = 0;
 
-  const chains: (0 | 1)[] = wallet.hasInternal ? [0, 1] : [0];
+  const report = () => onProgress?.({ checked, used, txs: txsById.size });
 
-  for (const chain of chains) {
-    let index = 0;
-    let unusedRun = 0;
+  async function scanChain(chain: 0 | 1) {
+    const key = chain === 0 ? "external" : "internal";
+    let next = 0; // next index to hand out
+    const done = new Set<number>();
+    // Derive in chunks so we do not call into wasm once per address.
+    const derived: DerivedAddress[] = [];
+    const ensureDerived = (i: number) => {
+      while (derived.length <= i) {
+        const chunk = wallet.addresses(chain, derived.length, 50);
+        derived.push(...chunk);
+        addresses.push(...chunk);
+      }
+      return derived[i]!;
+    };
+    // The window closes once `gap` consecutive indices past the highest used are all done.
+    const limit = () => lastUsed[key] + gap; // inclusive highest index we must check
+    const finished = () => {
+      for (let i = lastUsed[key] + 1; i <= limit(); i++) if (!done.has(i)) return false;
+      return true;
+    };
 
-    while (unusedRun < gap) {
-      signal?.throwIfAborted();
-      const derived = wallet.addresses(chain, index, batch);
-      addresses.push(...derived);
-
-      const results = await Promise.all(derived.map((a) => client.addressTxs(a.address)));
-
-      for (let i = 0; i < derived.length; i++) {
-        const txs = results[i]!;
-        if (txs.length === 0) {
-          unusedRun++;
-        } else {
-          unusedRun = 0;
+    async function worker() {
+      while (!finished()) {
+        signal?.throwIfAborted();
+        if (next > limit()) {
+          // Nothing more to hand out until an in-flight request extends the window.
+          await new Promise((r) => setTimeout(r, 25));
+          continue;
+        }
+        const i = next++;
+        const a = ensureDerived(i);
+        const txs = await client.addressTxs(a.address);
+        done.add(i);
+        checked++;
+        if (txs.length > 0) {
           used++;
-          const key = chain === 0 ? "external" : "internal";
-          lastUsed[key] = Math.max(lastUsed[key], derived[i]!.index);
+          lastUsed[key] = Math.max(lastUsed[key], i);
           for (const tx of txs) txsById.set(tx.txid, tx);
         }
-        if (unusedRun >= gap) break;
+        report();
       }
-
-      index += batch;
-      onProgress?.({ chain, index: index - 1, used, txs: txsById.size });
     }
+
+    await Promise.all(Array.from({ length: concurrency }, worker));
   }
 
+  const chains: (0 | 1)[] = wallet.hasInternal ? [0, 1] : [0];
+  await Promise.all(chains.map(scanChain));
+
+  // Keep only addresses the caller might see (up to the last one checked per chain).
   return { addresses, txs: [...txsById.values()], lastUsed };
 }

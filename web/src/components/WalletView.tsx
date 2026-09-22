@@ -13,7 +13,9 @@ import Simulator from "./Simulator";
 type Tab = "coins" | "check";
 
 export default function WalletView() {
-  const { info, demo, scanning, progress, snapshot, analysis, tipHeight, error, rescan, reset } = useWalletStore();
+  const {
+    info, demo, remembered, scanning, progress, stale, scannedAt, snapshot, analysis, tipHeight, error, fallbackNotice, rescan, reset, forget,
+  } = useWalletStore();
   const endpoint = useSettings((s) => (info ? s.endpoints[info.network] : ""));
   const { strategy, manual, toggleManual, result } = useSimulator();
   const [tab, setTab] = useState<Tab>("coins");
@@ -64,6 +66,11 @@ export default function WalletView() {
           <button onClick={reset} className="text-zinc-400 hover:text-zinc-200">
             Use a different wallet
           </button>
+          {remembered && (
+            <button onClick={() => void forget()} className="text-zinc-500 hover:text-red-300" title="Remove this wallet and its cached data from this device">
+              Forget
+            </button>
+          )}
         </div>
       </header>
 
@@ -71,12 +78,12 @@ export default function WalletView() {
         <div className="rounded-md border border-zinc-800 bg-zinc-900/40 px-4 py-3 text-sm text-zinc-400">
           <div className="flex items-center gap-2">
             <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-400" />
-            Looking up your addresses on {hostOf(endpoint)}…
+            {stale ? "Showing what we saw last time while checking for changes on" : "Looking up your addresses on"}{" "}
+            {hostOf(endpoint)}…
           </div>
           {progress && (
             <div className="mt-1 text-xs text-zinc-500">
-              {progress.chain === 0 ? "Receive" : "Change"} addresses checked: {progress.index + 1} · {progress.used} in use ·{" "}
-              {progress.txs} transactions found
+              {progress.checked} addresses checked · {progress.used} in use · {progress.txs} transactions found
             </div>
           )}
         </div>
@@ -85,7 +92,14 @@ export default function WalletView() {
       {error && (
         <p role="alert" className="rounded-md border border-red-900 bg-red-950/50 px-3 py-2 text-sm text-red-300">
           {error}
+          {snapshot && scannedAt && <span className="block text-xs text-red-400/80">Showing data from {new Date(scannedAt).toLocaleString()}.</span>}
         </p>
+      )}
+
+      {fallbackNotice && <p className="rounded-md border border-amber-900/60 bg-amber-950/30 px-3 py-2 text-xs text-amber-200">{fallbackNotice}</p>}
+
+      {!scanning && !error && scannedAt && !demo && (
+        <p className="text-xs text-zinc-600">Last checked {new Date(scannedAt).toLocaleString()}</p>
       )}
 
       {snapshot && !hasCoins && !scanning && (
