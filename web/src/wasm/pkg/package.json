@@ -1,0 +1,21 @@
+{
+  "name": "satlas-wasm",
+  "type": "module",
+  "description": "wasm-bindgen bindings for satlas-core.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anirudhpatwal/satlas"
+  },
+  "files": [
+    "satlas_wasm_bg.wasm",
+    "satlas_wasm.js",
+    "satlas_wasm.d.ts"
+  ],
+  "main": "satlas_wasm.js",
+  "types": "satlas_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
