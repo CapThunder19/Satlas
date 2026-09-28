@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-label="Satlas: know what your Bitcoin reveals before you spend it">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#09090b"/>
+      <stop offset="1" stop-color="#18181b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.82" cy="0.5" r="0.45">
+      <stop offset="0" stop-color="#f59e0b" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="320" rx="16" fill="url(#bg)"/>
+  <rect width="1200" height="320" rx="16" fill="url(#glow)"/>
+
+  <!-- coin map motif -->
+  <g transform="translate(900 160)">
+    <circle r="118" fill="#3987e5" fill-opacity="0.07" stroke="#3987e5" stroke-opacity="0.25" stroke-width="2"/>
+    <circle cx="-58" cy="-30" r="30" fill="#3987e5"/>
+    <circle cx="10" cy="40" r="20" fill="#3987e5"/>
+    <circle cx="48" cy="-44" r="14" fill="#3987e5"/>
+    <line x1="-58" y1="-30" x2="10" y2="40" stroke="#a1a1aa" stroke-opacity="0.6" stroke-width="2"/>
+    <circle cx="-58" cy="-30" r="36" fill="none" stroke="#f59e0b" stroke-width="3"/>
+  </g>
+  <g transform="translate(1135 60)">
+    <circle r="44" fill="#d95926" fill-opacity="0.1" stroke="#d95926" stroke-opacity="0.3" stroke-width="2"/>
+    <circle r="22" fill="#d95926"/>
+    <circle r="28" fill="none" stroke="#f59e0b" stroke-width="3"/>
+  </g>
+  <line x1="842" y1="130" x2="1113" y2="72" stroke="#f59e0b" stroke-width="3" stroke-dasharray="10 8"/>
+
+  <text x="64" y="138" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="76" font-weight="700" fill="#fafafa">Satlas</text>
+  <text x="66" y="192" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="30" fill="#e4e4e7">Know what your Bitcoin reveals</text>
+  <text x="66" y="232" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="30" font-weight="600" fill="#f59e0b">before you spend it.</text>
+  <text x="66" y="280" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="16" fill="#a1a1aa">Watch-only · Client-side · Rust + WebAssembly · BIP-329</text>
+</svg>
