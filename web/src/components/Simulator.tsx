@@ -168,7 +168,7 @@ function Result({ sim, alternatives, onPick }: { sim: Simulation; alternatives: 
                 </span>
                 <button
                   onClick={() => onPick(a.strategy)}
-                  className="rounded-md bg-emerald-600 px-3 py-1 text-xs font-semibold text-white hover:bg-emerald-500"
+                  className="rounded-md bg-emerald-500 px-3 py-1 text-xs font-semibold text-black hover:bg-emerald-400"
                 >
                   Show me
                 </button>

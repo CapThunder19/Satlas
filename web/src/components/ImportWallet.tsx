@@ -79,7 +79,7 @@ export default function ImportWallet() {
         <button
           type="submit"
           disabled={importing || trimmed === ""}
-          className="rounded-md bg-amber-500 px-5 py-2 text-sm font-semibold text-zinc-950 hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-md bg-amber-500 px-5 py-2 text-sm font-semibold text-black hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {importing ? "Checking…" : "Show my coins"}
         </button>

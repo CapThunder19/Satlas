@@ -36,7 +36,7 @@ interface Props {
   simulation: Simulation | null;
 }
 
-const SURFACE = "#18181b";
+const SURFACE = "var(--color-zinc-900)";
 
 export default function CoinGraph({ utxos, analysis, simulation }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -227,7 +227,7 @@ export default function CoinGraph({ utxos, analysis, simulation }: Props) {
               y1={s.y}
               x2={t.x}
               y2={t.y}
-              stroke={would ? SPEND_HIGHLIGHT : "#a1a1aa"}
+              stroke={would ? SPEND_HIGHLIGHT : "var(--color-zinc-400)"}
               strokeWidth={would ? 2.5 : 2}
               strokeDasharray={would ? "6 5" : undefined}
               strokeOpacity={would ? 0.95 : 0.6}
@@ -246,7 +246,7 @@ export default function CoinGraph({ utxos, analysis, simulation }: Props) {
             textAnchor="middle"
             fontSize={12}
             fontWeight={600}
-            fill="#e4e4e7"
+            fill="var(--color-zinc-200)"
             stroke={SURFACE}
             strokeWidth={4}
             paintOrder="stroke"
@@ -291,14 +291,14 @@ export default function CoinGraph({ utxos, analysis, simulation }: Props) {
               <circle r={n.r} fill={colorOf(n.group)} stroke={SURFACE} strokeWidth={2} />
               {n.utxo.chain === 1 && <circle r={Math.max(2, n.r * 0.3)} fill={SURFACE} fillOpacity={0.9} />}
               {(n.info?.addressUseCount ?? 1) > 1 && (
-                <circle r={n.r} fill="none" stroke="#a1a1aa" strokeWidth={1.5} strokeDasharray="3 3" />
+                <circle r={n.r} fill="none" stroke="var(--color-zinc-400)" strokeWidth={1.5} strokeDasharray="3 3" />
               )}
               {showLabels && (label || n.r >= 14) && (
                 <text
                   y={n.r + 13}
                   textAnchor="middle"
                   fontSize={11}
-                  fill={label ? "#e4e4e7" : "#a1a1aa"}
+                  fill={label ? "var(--color-zinc-200)" : "var(--color-zinc-400)"}
                   stroke={SURFACE}
                   strokeWidth={3}
                   paintOrder="stroke"
@@ -357,7 +357,7 @@ function Legend({ colors, analysis, hasSpend }: { colors: ReturnType<typeof assi
       <span className="inline-flex items-center gap-1.5">
         <span
           className="inline-block h-2.5 w-2.5 rounded-full"
-          style={{ background: `radial-gradient(circle, ${SURFACE} 0 30%, #71717a 31%)` }}
+          style={{ background: `radial-gradient(circle, ${SURFACE} 0 30%, var(--group-other) 31%)` }}
         />
         change coin (dot in the middle)
       </span>

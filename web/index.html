@@ -3,9 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Satlas</title>
+    <meta name="description" content="Satlas shows what a Bitcoin payment will reveal about you, before you send it. Watch-only, runs in your browser." />
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <title>Satlas — know what your bitcoin reveals</title>
+    <script>
+      // Apply a saved theme before first paint so there is no flash.
+      try {
+        var t = localStorage.getItem("satlas.theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
   </head>
-  <body>
+  <body class="bg-zinc-950">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

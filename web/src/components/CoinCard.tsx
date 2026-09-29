@@ -24,7 +24,7 @@ export default function CoinCard({
   utxo,
   analysis,
   clusterSize = 1,
-  clusterColor = "#71717a",
+  clusterColor = "var(--group-other)",
   tipHeight,
   selected,
   onToggle,

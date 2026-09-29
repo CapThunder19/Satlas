@@ -2,11 +2,12 @@ import { useState, type ReactNode } from "react";
 import ImportWallet from "./ImportWallet";
 import { useWalletStore } from "../state/wallet";
 import { WALLET_XPUB_HINTS } from "../lib/copy";
+import { CONTAINER } from "../lib/layout";
 
-const BLUE = "#3987e5";
-const ORANGE = "#d95926";
-const AQUA = "#199e70";
-const AMBER = "#f59e0b";
+const BLUE = "var(--group-1)";
+const ORANGE = "var(--group-2)";
+const AQUA = "var(--group-3)";
+const AMBER = "var(--spend)";
 
 export default function Landing() {
   const loadDemo = useWalletStore((s) => s.loadDemo);
@@ -31,7 +32,7 @@ export default function Landing() {
 
 function Section({ id, eyebrow, title, sub, children }: { id?: string; eyebrow: string; title: ReactNode; sub?: ReactNode; children: ReactNode }) {
   return (
-    <section id={id} className="mx-auto max-w-6xl scroll-mt-16 px-4 py-20 sm:py-24">
+    <section id={id} className={`${CONTAINER} scroll-mt-16 py-20 sm:py-24`}>
       <div className="mx-auto max-w-2xl text-center">
         <div className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">{eyebrow}</div>
         <h2 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">{title}</h2>
@@ -51,7 +52,7 @@ function Hero({ onDemo }: { onDemo: () => void }) {
       <div className="pointer-events-none absolute -top-40 right-0 h-[520px] w-[520px] rounded-full bg-amber-500/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 -left-20 h-[420px] w-[420px] rounded-full bg-sky-500/10 blur-3xl" />
 
-      <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 sm:py-28 lg:grid-cols-[1.05fr_1fr]">
+      <div className={`${CONTAINER} relative grid items-center gap-12 py-20 sm:py-28 lg:grid-cols-[1.05fr_1fr]`}>
         <div className="satlas-rise">
           <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/70 px-3 py-1 text-xs text-zinc-300">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -71,7 +72,7 @@ function Hero({ onDemo }: { onDemo: () => void }) {
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <button
               onClick={onDemo}
-              className="rounded-lg bg-amber-500 px-5 py-3 text-sm font-semibold text-zinc-950 shadow-lg shadow-amber-500/20 transition hover:bg-amber-400"
+              className="rounded-lg bg-amber-500 px-5 py-3 text-sm font-semibold text-black shadow-lg shadow-amber-500/20 transition hover:bg-amber-400"
             >
               Try the live demo →
             </button>
@@ -102,29 +103,29 @@ function HeroVisual() {
           <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
           <span className="ml-3 text-[11px] text-zinc-500">Map · planned payment of 0.23 BTC</span>
         </div>
-        <svg viewBox="0 0 440 300" className="block w-full rounded-xl" style={{ background: "#18181b" }} role="img" aria-label="Two separate groups of coins, and a payment that would link them">
+        <svg viewBox="0 0 440 300" className="block w-full rounded-xl" style={{ background: "var(--color-zinc-900)" }} role="img" aria-label="Two separate groups of coins, and a payment that would link them">
           {/* group: salary */}
           <circle cx="120" cy="130" r="78" fill={BLUE} fillOpacity="0.08" stroke={BLUE} strokeOpacity="0.3" strokeWidth="2" />
-          <text x="120" y="42" textAnchor="middle" fontSize="12" fontWeight="600" fill="#e4e4e7">Group 1 · Salary</text>
-          <circle cx="98" cy="118" r="30" fill={BLUE} stroke="#18181b" strokeWidth="2" />
-          <circle cx="152" cy="160" r="16" fill={BLUE} stroke="#18181b" strokeWidth="2" />
-          <circle cx="148" cy="96" r="10" fill={BLUE} stroke="#18181b" strokeWidth="2" />
+          <text x="120" y="42" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--color-zinc-200)">Group 1 · Salary</text>
+          <circle cx="98" cy="118" r="30" fill={BLUE} stroke="var(--color-zinc-900)" strokeWidth="2" />
+          <circle cx="152" cy="160" r="16" fill={BLUE} stroke="var(--color-zinc-900)" strokeWidth="2" />
+          <circle cx="148" cy="96" r="10" fill={BLUE} stroke="var(--color-zinc-900)" strokeWidth="2" />
           <circle cx="98" cy="118" r="37" fill="none" stroke={AMBER} strokeWidth="3" className="satlas-pulse" />
 
           {/* group: donation */}
           <circle cx="330" cy="200" r="58" fill={AQUA} fillOpacity="0.08" stroke={AQUA} strokeOpacity="0.3" strokeWidth="2" />
-          <text x="330" y="280" textAnchor="middle" fontSize="12" fontWeight="600" fill="#e4e4e7">Group 2 · Donation</text>
-          <circle cx="330" cy="200" r="22" fill={AQUA} stroke="#18181b" strokeWidth="2" />
+          <text x="330" y="280" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--color-zinc-200)">Group 2 · Donation</text>
+          <circle cx="330" cy="200" r="22" fill={AQUA} stroke="var(--color-zinc-900)" strokeWidth="2" />
           <circle cx="330" cy="200" r="29" fill="none" stroke={AMBER} strokeWidth="3" className="satlas-pulse" />
 
           {/* group: exchange (untouched) */}
           <circle cx="345" cy="62" r="34" fill={ORANGE} fillOpacity="0.08" stroke={ORANGE} strokeOpacity="0.3" strokeWidth="2" />
-          <circle cx="345" cy="62" r="14" fill={ORANGE} stroke="#18181b" strokeWidth="2" />
-          <text x="345" y="20" textAnchor="middle" fontSize="11" fill="#a1a1aa">Group 3 · Exchange</text>
+          <circle cx="345" cy="62" r="14" fill={ORANGE} stroke="var(--color-zinc-900)" strokeWidth="2" />
+          <text x="345" y="20" textAnchor="middle" fontSize="11" fill="var(--color-zinc-400)">Group 3 · Exchange</text>
 
           {/* the new link */}
           <line x1="128" y1="132" x2="304" y2="192" stroke={AMBER} strokeWidth="3" strokeDasharray="10 8" className="satlas-dash" />
-          <text x="206" y="186" textAnchor="middle" fontSize="11" fontWeight="600" fill={AMBER} stroke="#18181b" strokeWidth="4" paintOrder="stroke">
+          <text x="206" y="186" textAnchor="middle" fontSize="11" fontWeight="600" fill={AMBER} stroke="var(--color-zinc-900)" strokeWidth="4" paintOrder="stroke">
             new public link
           </text>
         </svg>
@@ -151,7 +152,7 @@ function ProofStrip() {
   ];
   return (
     <div className="border-b border-zinc-900 bg-zinc-950">
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-10 sm:grid-cols-4">
+      <div className={`${CONTAINER} grid grid-cols-2 gap-6 py-10 sm:grid-cols-4`}>
         {items.map((i) => (
           <div key={i.small} className="text-center">
             <div className="text-2xl font-semibold text-zinc-50 sm:text-3xl">{i.big}</div>
@@ -274,7 +275,7 @@ function TryIt() {
       title="Same payment. Very different story."
       sub="You want to send 0.23 BTC. Flip between what a typical wallet would do and what Satlas suggests."
     >
-      <div className="mx-auto max-w-3xl rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 sm:p-6">
+      <div className="mx-auto max-w-4xl rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-sm text-zinc-400">
             Send <span className="font-mono text-lg text-zinc-100">0.23 BTC</span>
@@ -399,9 +400,9 @@ function Trust() {
         <TrustCard
           tone="warn"
           title="By default…"
-          items={["your browser asks a public block explorer (mempool.space) about your addresses", "that explorer can see which addresses were looked up", "— the same trade-off as any watch-only wallet"]}
+          items={["your browser asks a public block explorer (mempool.space) about your addresses", "that explorer can see which addresses were looked up", "this is the same trade-off every watch-only wallet makes"]}
         />
-        <TrustCard tone="fix" title="To remove that…" items={["open Settings ⚙", "point Satlas at your own Esplora or mempool server", "now no third party sees your addresses at all"]} />
+        <TrustCard tone="fix" title="To remove that…" items={["open Settings (the gear icon, top right)", "point Satlas at your own Esplora or mempool server", "now no third party sees your addresses at all"]} />
       </div>
     </Section>
   );
@@ -479,7 +480,8 @@ function Start({ onDemo }: { onDemo: () => void }) {
   return (
     <section id="start" className="relative scroll-mt-16 overflow-hidden border-t border-zinc-900">
       <div className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-amber-500/10 blur-3xl" />
-      <div className="relative mx-auto max-w-3xl px-4 py-20 sm:py-24">
+      <div className={`${CONTAINER} relative py-20 sm:py-24`}>
+        <div className="mx-auto max-w-3xl">
         <div className="text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">Check your own wallet</h2>
           <p className="mt-3 text-zinc-400">Paste a public key. It stays in your browser.</p>
@@ -515,6 +517,7 @@ function Start({ onDemo }: { onDemo: () => void }) {
           <button onClick={onDemo} className="text-sm font-medium text-amber-400 underline-offset-4 hover:underline">
             Explore the demo wallet
           </button>
+        </div>
         </div>
       </div>
     </section>
